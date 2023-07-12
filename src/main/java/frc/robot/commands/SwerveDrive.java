@@ -4,25 +4,131 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.SwerveSubsystem;
 
 public class SwerveDrive extends CommandBase {
   /** Creates a new SwerveDrive. */
-  public SwerveDrive() {
+  public SwerveDrive(SwerveSubsystem ss) {
     // Use addRequirements() here to declare subsystem dependencies.
+    swerveSubsystem = ss;
+    addRequirements(ss);
   }
+
+  private final SwerveSubsystem swerveSubsystem;
+  public boolean field_oriented = false, flag = false;
+  public double targetAngle = 0;
+  public double[] angleGoal = new double[8], velocityGoal = new double[8];
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    field_oriented = false;
+  }
+
+  public void stop_all() {
+    RobotContainer.LeftBackSwerveModule.setStill();
+    RobotContainer.LeftFrontSwerveModule.setStill();
+    RobotContainer.RightBackSwerveModule.setStill();
+    RobotContainer.RightFrontSwerveModule.setStill();
+
+    for (int i = 1; i <= 4; i++) {
+      angleGoal[i] = 0;
+      velocityGoal[i] = 0;
+    }
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    SmartDashboard.putNumber("angle", swerveSubsystem.get_field_angle());
+    double x_value = RobotContainer.driveJoystick.getRawAxis(0);
+    double y_value = -RobotContainer.driveJoystick.getRawAxis(1);
+    double rot_value = RobotContainer.driveJoystick.getRawAxis(4);
+
+    if (RobotContainer.driveJoystick.getRawButtonPressed(1)) {
+      if (field_oriented) {
+        // Current state is true so turn off
+        field_oriented = false;
+        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 1);
+        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 1);
+        Timer.delay(0.1);
+        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 0);
+        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 0);
+      } else {
+        // Current state is false so turn on
+        field_oriented = true;
+        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 1);
+        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 1);
+        Timer.delay(0.1);
+        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 0);
+        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 0);
+      }
+    }
+    // field_oriented=false;
+    if (!flag) {
+      targetAngle = swerveSubsystem.get_field_angle();
+    }
+    SmartDashboard.putBoolean("field_oriented", field_oriented);
+    SmartDashboard.putNumber("targetangle", targetAngle);
+    if (Math.abs(x_value) < 0.1)
+      x_value = 0;
+    if (Math.abs(y_value) < 0.1)
+      y_value = 0;
+    if (Math.abs(rot_value) < 0.1)
+      rot_value = 0;
+    if (Math.abs(x_value) < 0.1 && Math.abs(y_value) < 0.1 && Math.abs(rot_value) < 0.1) {
+      stop_all();
+      flag = false;
+    } else {
+      if (Math.abs(rot_value) < 0.1)
+        flag = true;
+      else
+        flag = false;
+      if (field_oriented) {
+        swerveSubsystem.field_oriented(x_value, y_value, rot_value, Math.toRadians(swerveSubsystem.get_field_angle()));
+      } else {
+        if (flag) {
+          double error = targetAngle - swerveSubsystem.get_field_angle();
+          error = -error;
+          if (error > 180)
+            error -= 360;
+          else if (error < -180)
+            error += 360;
+          rot_value = error * 0.005;
+          SmartDashboard.putNumber("error", error);
+        }
+        swerveSubsystem.car_oriented(x_value, y_value, rot_value);
+        /*
+         * SmartDashboard.putNumber("x_axis", x_value);
+         * SmartDashboard.putNumber("y_axis", y_value);
+         * SmartDashboard.putNumber("z_axis", rot_value);
+         */
+      }
+
+      angleGoal = swerveSubsystem.get_theta();
+      velocityGoal = swerveSubsystem.get_velocity();
+
+      for (int i = 1; i <= 4; i++) {
+        angleGoal[i] = (Math.toDegrees(angleGoal[i])) % 360;
+        velocityGoal[i] = 18000 * velocityGoal[i] + 2000;
+      }
+
+      RobotContainer.LeftFrontSwerveModule.setStatus(angleGoal[1], velocityGoal[1]);
+      RobotContainer.RightFrontSwerveModule.setStatus(angleGoal[2], velocityGoal[2]);
+      RobotContainer.RightBackSwerveModule.setStatus(angleGoal[3], velocityGoal[3]);
+      RobotContainer.LeftBackSwerveModule.setStatus(angleGoal[4], velocityGoal[4]);
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

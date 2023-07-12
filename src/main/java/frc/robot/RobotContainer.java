@@ -6,8 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.SwerveDrive;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -22,11 +26,21 @@ public class RobotContainer {
 
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
+  public static SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+  public static SwerveModule LeftFrontSwerveModule = new SwerveModule(1, Constants.LFa, Constants.LFv, Constants.LF0, false);      //(number, angleMotorPort, velocityMotorPort, zeroPosition)
+  public static SwerveModule RightFrontSwerveModule = new SwerveModule(2, Constants.RFa, Constants.RFv, Constants.RF0, true);
+  public static SwerveModule RightBackSwerveModule = new SwerveModule(3, Constants.RBa, Constants.RBv, Constants.RB0, true);
+  public static SwerveModule LeftBackSwerveModule = new SwerveModule(4, Constants.LBa, Constants.LBv, Constants.LB0, false);
+  public static SwerveDrive swerveDrive = new SwerveDrive(swerveSubsystem);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
   }
+
+  public static Joystick driveJoystick = new Joystick(0);
+  public static Joystick ctrlJoystick = new Joystick(1);
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
