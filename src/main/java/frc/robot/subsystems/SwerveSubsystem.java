@@ -25,6 +25,10 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   // field-oriented
+  //m stands for the horizontal speed(take right for positive)
+  //f stands for the speed forward 
+  //r stands for the rotational speed (ccw for positive)
+  //a stands for the angel between the car & field (in radian!)
   private double s2 = Math.sqrt(2);
   private double maxv = 1;
   private double[] velocityGoal = new double[8], thetaGoal = new double[8];

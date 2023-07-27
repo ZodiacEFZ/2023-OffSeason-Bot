@@ -50,6 +50,8 @@ public class SwerveDrive extends CommandBase {
     double y_value = -RobotContainer.driveJoystick.getRawAxis(1);
     double rot_value = RobotContainer.driveJoystick.getRawAxis(4);
 
+    // System.out.print(x_value);
+
     if (RobotContainer.driveJoystick.getRawButtonPressed(1)) {
       if (field_oriented) {
         // Current state is true so turn off
@@ -75,11 +77,11 @@ public class SwerveDrive extends CommandBase {
     }
     SmartDashboard.putBoolean("field_oriented", field_oriented);
     SmartDashboard.putNumber("targetangle", targetAngle);
-    if (Math.abs(x_value) < 0.1)
+    if (Math.abs(x_value) < 0.05)
       x_value = 0;
-    if (Math.abs(y_value) < 0.1)
+    if (Math.abs(y_value) < 0.05)
       y_value = 0;
-    if (Math.abs(rot_value) < 0.1)
+    if (Math.abs(rot_value) < 0.05)
       rot_value = 0;
     if (Math.abs(x_value) < 0.1 && Math.abs(y_value) < 0.1 && Math.abs(rot_value) < 0.1) {
       stop_all();
@@ -94,7 +96,7 @@ public class SwerveDrive extends CommandBase {
       } else {
         if (flag) {
           double error = targetAngle - swerveSubsystem.get_field_angle();
-          error = -error;
+          error = -error; //seems wrong
           if (error > 180)
             error -= 360;
           else if (error < -180)
@@ -103,11 +105,11 @@ public class SwerveDrive extends CommandBase {
           SmartDashboard.putNumber("error", error);
         }
         swerveSubsystem.car_oriented(x_value, y_value, rot_value);
-        /*
-         * SmartDashboard.putNumber("x_axis", x_value);
-         * SmartDashboard.putNumber("y_axis", y_value);
-         * SmartDashboard.putNumber("z_axis", rot_value);
-         */
+        
+        SmartDashboard.putNumber("x_axis", x_value);
+        SmartDashboard.putNumber("y_axis", y_value);
+        SmartDashboard.putNumber("z_axis", rot_value);
+         
       }
 
       angleGoal = swerveSubsystem.get_theta();
@@ -117,6 +119,8 @@ public class SwerveDrive extends CommandBase {
         angleGoal[i] = (Math.toDegrees(angleGoal[i])) % 360;
         velocityGoal[i] = 18000 * velocityGoal[i] + 2000;
       }
+
+      SmartDashboard.putNumberArray("rawAngleGoal", angleGoal);
 
       RobotContainer.LeftFrontSwerveModule.setStatus(angleGoal[1], velocityGoal[1]);
       RobotContainer.RightFrontSwerveModule.setStatus(angleGoal[2], velocityGoal[2]);

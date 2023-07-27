@@ -15,17 +15,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveModule extends SubsystemBase {
   /** Creates a new SwerveModule. */
-  public SwerveModule(int number, int vID, int aID, int zeroPos, boolean inverse) {
+  public SwerveModule(int number, int aID, int vID, int zeroPos, boolean inverse) {
     this.number = number;
     this.zeroPos = zeroPos;
 
     angle = 0;
-    targetAngle = 0;
 
     velocityMotor = new WPI_TalonFX(vID);
     velocityMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     velocityMotor.configFactoryDefault();
-    velocityMotor.config_kP(0, 0);
+    velocityMotor.config_kP(0, 0.1);
     velocityMotor.config_kI(0, 0);
     velocityMotor.config_kD(0, 0);
     velocityMotor.config_kF(0, 0);
@@ -36,21 +35,21 @@ public class SwerveModule extends SubsystemBase {
     angleMotor = new WPI_TalonSRX(aID);
     angleMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 0);
     angleMotor.configFactoryDefault();
-    angleMotor.config_kP(0, 0);
+    angleMotor.config_kP(0, 0.8);
     angleMotor.config_kI(0, 0);
     angleMotor.config_kD(0, 0);
     angleMotor.config_kF(0, 0);
-    // angleMotor.set(ControlMode.Position, zeroPos);
+    angleMotor.set(ControlMode.Position, zeroPos);
     angleMotor.setNeutralMode(NeutralMode.Brake);
     angleMotor.setSensorPhase(true);
-    angleMotor.setInverted(inverse);
+    angleMotor.setInverted(false);
   }
 
   private WPI_TalonFX velocityMotor;
   private WPI_TalonSRX angleMotor;
 
-  private double angle, targetAngle;
-  private int zeroPos;
+  private double angle;
+  private double zeroPos;
   private double kV;
   private int number;
   private double position;
@@ -68,7 +67,7 @@ public class SwerveModule extends SubsystemBase {
 
   public void setStatus(double angleGoal, double velocityGoal) {
     double deltaTheta = 0;
-    double rawDeltaTheta = targetAngle - angle;
+    double rawDeltaTheta = angleGoal - angle;
 
     if (Math.abs(rawDeltaTheta) <= 90) {
       deltaTheta = rawDeltaTheta;
@@ -87,10 +86,12 @@ public class SwerveModule extends SubsystemBase {
 
     if (rawDeltaTheta < -90 && rawDeltaTheta > -270) {
       deltaTheta = rawDeltaTheta + 180;
+      kV = -1;
     }
 
     if (rawDeltaTheta <= -270 && rawDeltaTheta >= -360) {
       deltaTheta = rawDeltaTheta + 360;
+      kV = 1;
     }
 
     double positionGoal = deltaTheta / 360 * 4096 + position;
@@ -99,7 +100,11 @@ public class SwerveModule extends SubsystemBase {
       angleMotor.set(ControlMode.Position, positionGoal);
     }
 
-    velocityMotor.set(ControlMode.Velocity, kV * angleGoal);
+    SmartDashboard.putNumber("deltaTheta" + number, deltaTheta);
+    SmartDashboard.putNumber("AngleGoal" + number, angleGoal);
+    SmartDashboard.putNumber("PositionGoal" + number, positionGoal);
+
+    velocityMotor.set(ControlMode.Velocity, kV * velocityGoal);
   }
 
   public void setStill() {

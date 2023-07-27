@@ -28,9 +28,9 @@ public class RobotContainer {
 
   public static SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   public static SwerveModule LeftFrontSwerveModule = new SwerveModule(1, Constants.LFa, Constants.LFv, Constants.LF0, false);      //(number, angleMotorPort, velocityMotorPort, zeroPosition)
-  public static SwerveModule RightFrontSwerveModule = new SwerveModule(2, Constants.RFa, Constants.RFv, Constants.RF0, true);
+  public static SwerveModule RightFrontSwerveModule = new SwerveModule(2, Constants.RFa, Constants.RFv, Constants.RF0,true);
   public static SwerveModule RightBackSwerveModule = new SwerveModule(3, Constants.RBa, Constants.RBv, Constants.RB0, true);
-  public static SwerveModule LeftBackSwerveModule = new SwerveModule(4, Constants.LBa, Constants.LBv, Constants.LB0, false);
+  public static SwerveModule LeftBackSwerveModule = new SwerveModule(4, Constants.LBa, Constants.LBv, Constants.LB0, true);
   public static SwerveDrive swerveDrive = new SwerveDrive(swerveSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
