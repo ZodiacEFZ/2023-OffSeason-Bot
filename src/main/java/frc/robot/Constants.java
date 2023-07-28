@@ -13,9 +13,12 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final int LFa = 38, LFv = 18, LF0 = 550;
-    public static final int RFa = 36, RFv = 16, RF0 = -612;
-    public static final int RBa = 34, RBv = 14, RB0 = 1860;
-    public static final int LBa = 32, LBv = 12, LB0 = 330;
-    public static final int spinLeftPort = 0, spinRightPort = 0, armPort = 0;
+    public static final int LFa = 38, LFv = 18, LF0 = -5433;
+    public static final int RFa = 36, RFv = 16, RF0 = -6610;
+    public static final int RBa = 34, RBv = 14, RB0 = -10592;
+    public static final int LBa = 32, LBv = 12, LB0 = -8488;
+    public static final int spinMotorPort = 0, intakeArmPort = 0;
+    public static final int serializerPort = 0;
+    public static final int intakeMotorPort = 0;
+    public static final int intakeEncoderPort = 0;
 }

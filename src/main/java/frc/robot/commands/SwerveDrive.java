@@ -21,7 +21,7 @@ public class SwerveDrive extends CommandBase {
 
   private final SwerveSubsystem swerveSubsystem;
   public boolean field_oriented = false, flag = false;
-  public double targetAngle = 0;
+  public double targetAngle = 0, dead_zone=0.15;
   public double[] angleGoal = new double[8], velocityGoal = new double[8];
 
   // Called when the command is initially scheduled.
@@ -48,7 +48,7 @@ public class SwerveDrive extends CommandBase {
     SmartDashboard.putNumber("angle", swerveSubsystem.get_field_angle());
     double x_value = RobotContainer.driveJoystick.getRawAxis(0);
     double y_value = -RobotContainer.driveJoystick.getRawAxis(1);
-    double rot_value = RobotContainer.driveJoystick.getRawAxis(4);
+    double rot_value = -RobotContainer.driveJoystick.getRawAxis(4);
 
     // System.out.print(x_value);
 
@@ -77,17 +77,17 @@ public class SwerveDrive extends CommandBase {
     }
     SmartDashboard.putBoolean("field_oriented", field_oriented);
     SmartDashboard.putNumber("targetangle", targetAngle);
-    if (Math.abs(x_value) < 0.05)
+    if (Math.abs(x_value) < dead_zone)
       x_value = 0;
-    if (Math.abs(y_value) < 0.05)
+    if (Math.abs(y_value) < dead_zone)
       y_value = 0;
-    if (Math.abs(rot_value) < 0.05)
+    if (Math.abs(rot_value) < dead_zone)
       rot_value = 0;
-    if (Math.abs(x_value) < 0.1 && Math.abs(y_value) < 0.1 && Math.abs(rot_value) < 0.1) {
+    if (Math.abs(x_value) < dead_zone && Math.abs(y_value) < dead_zone && Math.abs(rot_value) < dead_zone) {
       stop_all();
       flag = false;
     } else {
-      if (Math.abs(rot_value) < 0.1)
+      if (Math.abs(rot_value) < dead_zone)
         flag = true;
       else
         flag = false;
@@ -96,11 +96,12 @@ public class SwerveDrive extends CommandBase {
       } else {
         if (flag) {
           double error = targetAngle - swerveSubsystem.get_field_angle();
-          error = -error; //seems wrong
+          //error = -error; //seems wrong
           if (error > 180)
             error -= 360;
           else if (error < -180)
             error += 360;
+          // error=0;
           rot_value = error * 0.005;
           SmartDashboard.putNumber("error", error);
         }

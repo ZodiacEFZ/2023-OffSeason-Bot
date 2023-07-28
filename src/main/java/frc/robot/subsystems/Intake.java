@@ -5,7 +5,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -14,18 +16,23 @@ import frc.robot.RobotContainer;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   public Intake() {
-    spinLeft.configFactoryDefault();
-    spinLeft.setInverted(false);
+    serializer.configFactoryDefault();
+    serializer.setInverted(true);
+    serializer.set(0.4);
 
-    spinRight.configFactoryDefault();
-    spinRight.follow(spinLeft);
-    spinRight.setInverted(true);
+    shooter.configFactoryDefault();
+    shooter.setInverted(true);
+
+    intakeEncoder.setSensorPhase(true);
+    intakeEncoder.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
   }
 
-  private WPI_TalonFX spinLeft = new WPI_TalonFX(Constants.spinLeftPort);
-  private WPI_TalonFX spinRight = new WPI_TalonFX(Constants.spinRightPort);
+  private WPI_TalonFX shooter = new WPI_TalonFX(Constants.spinMotorPort);
+  private WPI_TalonFX serializer = new WPI_TalonFX(Constants.serializerPort);
+  private WPI_TalonFX intakeArm = new WPI_TalonFX(Constants.intakeArmPort);
+  private WPI_TalonFX intakeMotor = new WPI_TalonFX(Constants.intakeMotorPort);
 
-  private WPI_TalonFX arm = new WPI_TalonFX(Constants.armPort);
+  private WPI_TalonSRX intakeEncoder = new WPI_TalonSRX(Constants.intakeEncoderPort);
 
   private int upPos = 0, downPos = 0;
   public boolean downStatus = false;
@@ -34,25 +41,29 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     if (RobotContainer.ctrlJoystick.getRawButtonPressed(1)) {
-      
+      down();
+    } else if (RobotContainer.ctrlJoystick.getRawButtonPressed(4)) {
+      up();
+    }
+    if (RobotContainer.ctrlJoystick.getRawButton(3)) {
+      shooter.set(0.8);
+    } else {
+      shooter.set(0);
+    }
+    if (RobotContainer.ctrlJoystick.getRawButton(2)) {
+      serializer.set(-0.4);
+    } else {
+      serializer.set(0.4);
     }
   }
 
-  public void intake() {
-    spinLeft.set(0.5);
-  }
-
-  public void stop() {
-    spinLeft.set(0);
-  }
-
   public void up() {
-    arm.set(ControlMode.Position, upPos);
-    downStatus = false;
+    intakeArm.set(ControlMode.Position, upPos);
+    intakeMotor.set(0);
   }
 
   public void down() {
-    arm.set(ControlMode.Position, downPos);
-    downStatus = true;
+    intakeArm.set(ControlMode.Position, downPos);
+    intakeArm.set(0.5);
   }
 }

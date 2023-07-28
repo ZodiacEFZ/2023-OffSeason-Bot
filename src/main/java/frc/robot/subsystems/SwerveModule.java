@@ -23,8 +23,8 @@ public class SwerveModule extends SubsystemBase {
 
     velocityMotor = new WPI_TalonFX(vID);
     velocityMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    velocityMotor.configFactoryDefault();
-    velocityMotor.config_kP(0, 0.1);
+    // velocityMotor.configFactoryDefault();
+    velocityMotor.config_kP(0, 0.06);
     velocityMotor.config_kI(0, 0);
     velocityMotor.config_kD(0, 0);
     velocityMotor.config_kF(0, 0);
@@ -34,12 +34,12 @@ public class SwerveModule extends SubsystemBase {
 
     angleMotor = new WPI_TalonSRX(aID);
     angleMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 0);
-    angleMotor.configFactoryDefault();
+    // angleMotor.configFactoryDefault();
     angleMotor.config_kP(0, 0.8);
     angleMotor.config_kI(0, 0);
     angleMotor.config_kD(0, 0);
     angleMotor.config_kF(0, 0);
-    angleMotor.set(ControlMode.Position, zeroPos);
+    // angleMotor.set(ControlMode.Position, zeroPos);
     angleMotor.setNeutralMode(NeutralMode.Brake);
     angleMotor.setSensorPhase(true);
     angleMotor.setInverted(false);
