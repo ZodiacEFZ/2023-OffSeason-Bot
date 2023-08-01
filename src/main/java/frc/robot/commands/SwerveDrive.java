@@ -19,9 +19,18 @@ public class SwerveDrive extends CommandBase {
     addRequirements(ss);
   }
 
-  private final SwerveSubsystem swerveSubsystem;
+  public static SwerveDrive instance;
+
+  public static SwerveDrive getInstance() {
+    if (instance == null) {
+      instance = new SwerveDrive(SwerveSubsystem.getInstance());
+    }
+    return instance;
+  }
+
+  public final SwerveSubsystem swerveSubsystem;
   public boolean field_oriented = false, flag = false;
-  public double targetAngle = 0, dead_zone=0.15;
+  public double targetAngle = 0, deadZone=0.15;
   public double[] angleGoal = new double[8], velocityGoal = new double[8];
 
   // Called when the command is initially scheduled.
@@ -56,19 +65,11 @@ public class SwerveDrive extends CommandBase {
       if (field_oriented) {
         // Current state is true so turn off
         field_oriented = false;
-        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 1);
-        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 1);
-        Timer.delay(0.1);
-        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 0);
-        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 0);
+        RobotContainer.driveRumble();
       } else {
         // Current state is false so turn on
         field_oriented = true;
-        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 1);
-        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 1);
-        Timer.delay(0.1);
-        RobotContainer.driveJoystick.setRumble(RumbleType.kLeftRumble, 0);
-        RobotContainer.driveJoystick.setRumble(RumbleType.kRightRumble, 0);
+        RobotContainer.driveRumble();
       }
     }
     // field_oriented=false;
@@ -77,17 +78,17 @@ public class SwerveDrive extends CommandBase {
     }
     SmartDashboard.putBoolean("field_oriented", field_oriented);
     SmartDashboard.putNumber("targetangle", targetAngle);
-    if (Math.abs(x_value) < dead_zone)
+    if (Math.abs(x_value) < deadZone)
       x_value = 0;
-    if (Math.abs(y_value) < dead_zone)
+    if (Math.abs(y_value) < deadZone)
       y_value = 0;
-    if (Math.abs(rot_value) < dead_zone)
+    if (Math.abs(rot_value) < deadZone)
       rot_value = 0;
-    if (Math.abs(x_value) < dead_zone && Math.abs(y_value) < dead_zone && Math.abs(rot_value) < dead_zone) {
+    if (Math.abs(x_value) < deadZone && Math.abs(y_value) < deadZone && Math.abs(rot_value) < deadZone) {
       stop_all();
       flag = false;
     } else {
-      if (Math.abs(rot_value) < dead_zone)
+      if (Math.abs(rot_value) < deadZone)
         flag = true;
       else
         flag = false;

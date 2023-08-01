@@ -16,6 +16,15 @@ public class SwerveSubsystem extends SubsystemBase {
     ahrs = new AHRS(SPI.Port.kMXP);
   }
 
+  private static SwerveSubsystem instance;
+
+  public static SwerveSubsystem getInstance() {
+    if (instance == null) {
+      instance = new SwerveSubsystem();
+    }
+    return instance;
+  }
+
   AHRS ahrs;
 
   @Override

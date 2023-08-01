@@ -7,9 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.SignalControl;
 import frc.robot.commands.SwerveDrive;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.ShootingSubsystem;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +37,9 @@ public class RobotContainer {
   public static SwerveModule LeftBackSwerveModule = new SwerveModule(4, Constants.LBa, Constants.LBv, Constants.LB0, true);
   public static SwerveDrive swerveDrive = new SwerveDrive(swerveSubsystem);
 
+  private static ShootingSubsystem m_intake = new ShootingSubsystem();
+  public static SignalControl sc = new SignalControl(m_intake);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
@@ -41,6 +48,24 @@ public class RobotContainer {
 
   public static Joystick driveJoystick = new Joystick(0);
   public static Joystick ctrlJoystick = new Joystick(1);
+
+  public static void driveRumble() {
+    driveJoystick.setRumble(RumbleType.kLeftRumble, 1);
+    driveJoystick.setRumble(RumbleType.kRightRumble, 1);
+    Timer.delay(0.1);
+    driveJoystick.setRumble(RumbleType.kLeftRumble, 0);
+    driveJoystick.setRumble(RumbleType.kRightRumble, 0);
+    Timer.delay(0.1);
+  }
+
+  public static void ctrlRumble() {
+    ctrlJoystick.setRumble(RumbleType.kLeftRumble, 1);
+    ctrlJoystick.setRumble(RumbleType.kRightRumble, 1);
+    Timer.delay(0.1);
+    ctrlJoystick.setRumble(RumbleType.kLeftRumble, 0);
+    ctrlJoystick.setRumble(RumbleType.kRightRumble, 0);
+    Timer.delay(0.1);
+  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by

@@ -83,6 +83,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     CommandScheduler.getInstance().schedule(RobotContainer.swerveDrive);
+    CommandScheduler.getInstance().schedule(RobotContainer.sc);
   }
 
   @Override
