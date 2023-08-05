@@ -28,14 +28,17 @@ public class ShootingSubsystem extends SubsystemBase {
   /** Creates a new Intake. */
   public ShootingSubsystem() {
     angleEncoder.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-
-    angleControlTalonFX.setInverted(true);
-    angleControlTalonFX.setNeutralMode(NeutralMode.Brake);
-
+    //angleEncoder.setInverted(true);
+    angleEncoder.config_kP(0, 0.15);
+    angleEncoder.config_kI(0, 0.0001);
+    angleEncoder.config_kD(0, 0);
+    angleEncoder.config_kF(0, 0);
+    angleEncoder.setNeutralMode(NeutralMode.Brake);
+    
     shooter.configFactoryDefault();
-    shooter.config_kP(0, 0.3);
-    shooter.config_kI(0, 0);
-    shooter.config_kD(0, 0);
+    shooter.config_kP(0, 0.1);
+    shooter.config_kI(0, 0.00025);
+    shooter.config_kD(0, 0.01);
     shooter.config_kF(0, 0);
     shooter.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     shooter.configVoltageCompSaturation(10);
@@ -44,38 +47,41 @@ public class ShootingSubsystem extends SubsystemBase {
     shooter.configVelocityMeasurementWindow(1);
     shooter.setInverted(true);
 
-    intakeEncoder.setSensorPhase(true);
-    intakeEncoder.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-
-    intakeArm.configFactoryDefault();
-    intakeArm.config_kP(0, 0.1);
-    intakeArm.config_kP(0, 0);
-    intakeArm.config_kP(0, 0);
-    intakeArm.setNeutralMode(NeutralMode.Brake);
-
     intakeMotor.configFactoryDefault();
     intakeMotor.setInverted(false);
+
+    serializer.configVoltageCompSaturation(10);
+    serializer.enableVoltageCompensation(true);
+    serializer.setNeutralMode(NeutralMode.Brake);
+  }
+
+  public static ShootingSubsystem instance;
+  public static ShootingSubsystem getInstance() {
+    if (instance == null) {
+      instance = new ShootingSubsystem();
+    }
+    return instance;
   }
 
   public WPI_TalonFX shooter = new WPI_TalonFX(Constants.spinMotorPort);
   public WPI_TalonFX serializer = new WPI_TalonFX(Constants.serializerPort);
   public WPI_TalonFX angleControlTalonFX = new WPI_TalonFX(Constants.angleControlPort);
   public WPI_TalonSRX angleEncoder = new WPI_TalonSRX(Constants.angleEncoderPort);
-  public WPI_TalonFX intakeArm = new WPI_TalonFX(Constants.intakeArmPort);
+ // public WPI_TalonFX intakeArm = new WPI_TalonFX(Constants.intakeArmPort);
   public WPI_TalonFX intakeMotor = new WPI_TalonFX(Constants.intakeMotorPort);
 
-  private WPI_TalonSRX intakeEncoder = new WPI_TalonSRX(Constants.intakeEncoderPort);
+  //private WPI_TalonSRX intakeEncoder = new WPI_TalonSRX(Constants.intakeEncoderPort);
 
   public int upPos = 0;
   public int downPos = 0;
   public boolean downStatus = false;
 
   public boolean anglePosDown = true;
-  private int angleZeroPos = 0;
+  private int angleZeroPos = 1200;
   private double anglePos = 0;
 
   public double targetHeight = 264, limelightHeight = 52; // all in centimetres
-  public double limelightAngle = 51.6 * 3.14159 / 180, targetAngle = 0; // all in radians
+  public double limelightAngle = 45 * 3.14159 / 180, targetAngle = 0; // all in radians
 
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
   NetworkTableEntry tx = table.getEntry("tx");
@@ -92,14 +98,17 @@ public class ShootingSubsystem extends SubsystemBase {
 
   private static final Point2D[] kAngles = new Point2D.Double[] {
       // distance(cm), angle(pos)
-      new Point2D.Double(1, 2),
+      new Point2D.Double(350, -1700),
+      new Point2D.Double(280, -460),
+      new Point2D.Double(220, 30),
+      new Point2D.Double(200, 424),
+      new Point2D.Double(175, 875),
   };
 
   private static final LinearInterpolationTable kAngleTable = new LinearInterpolationTable(kAngles);
 
   private static final Point2D[] kRPMs = new Point2D.Double[] {
       // distance(cm), RPM
-      new Point2D.Double(),
   };
 
   private static final LinearInterpolationTable kRPMTable = new LinearInterpolationTable(kRPMs);
@@ -119,6 +128,7 @@ public class ShootingSubsystem extends SubsystemBase {
     targetAngle = targetY * 3.14159 / 180;
     SmartDashboard.putNumber("targetAngle", targetAngle);
 
+    //angleEncoder.set(ControlMode.Position, -6600);
     anglePos = angleEncoder.getSelectedSensorPosition();
     SmartDashboard.putNumber("anglePos", anglePos);
 
@@ -126,53 +136,36 @@ public class ShootingSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("distance", distance);
 
     SmartDashboard.putNumber("shooterVelocity", shooter.getSelectedSensorVelocity());
+
   }
 
-  public void up() {
-    intakeArm.set(ControlMode.Position, upPos);
-    intakeMotor.set(0);
+
+  public void aim() {
+    double shootingAngle = 3075.03 - 3.91221 * distance;
+    if(shootingAngle<-6600) shootingAngle=-6600;
+    if(shootingAngle>3400) shootingAngle=3400;
+    angleEncoder.set(ControlMode.Position, shootingAngle);
   }
 
-  public void down() {
-    intakeArm.set(ControlMode.Position, downPos);
-    intakeMotor.set(0.2);
-  }
-
-  public boolean aim() {
-    double aimRange = 1;
-    if (!spotted) {
-      RobotContainer.ctrlRumble();
-      return false;
-    }
-    while ((targetX > aimRange || targetX < aimRange * -1) && spotted) {
-      if (targetX > aimRange) {
-        SwerveDrive.getInstance().swerveSubsystem.car_oriented(0, 0, 0.25 * (targetX / 24));
-      } else if (targetX < aimRange * -1) {
-        SwerveDrive.getInstance().swerveSubsystem.car_oriented(0, 0, -0.25 * (targetX / 24));
-      } else {
-        RobotContainer.ctrlRumble();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public void shoot() {
-    double shootRPM = kRPMTable.getOutput(distance);
-    double shootAngle = kAngleTable.getOutput(distance);
-    angleControlTalonFX.set(ControlMode.Position, shootAngle);
-    shooter.set(ControlMode.Velocity, shootRPM);
-    if (shooter.getSelectedSensorVelocity() >= shootRPM - 100) {
-      serializer.set(0.2);
-    }
+  public void shootLow() {
+    shooter.set(0.3);
+    // Timer.delay(0.5);
+    angleEncoder.set(ControlMode.Position, -3000);
+    Timer.delay(1);
+    serializer.set(0.2);
+    Timer.delay(1);
     shooter.set(0);
+    serializer.set(0);
   }
 }
 
 /*
  * List of shooting data:
  * Pos Dis
+ * 1000 370
+ * 1745 304
+ * 2136 270
+ * 2146 315
+ * 1760     425
  * 
- * 
- * f(d) =
  */

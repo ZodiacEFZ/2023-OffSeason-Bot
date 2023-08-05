@@ -6,6 +6,8 @@ package frc.robot.commands;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -28,43 +30,44 @@ public class SignalControl extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (RobotContainer.ctrlJoystick.getRawButtonPressed(4)) { // TODO: check Falcon
-      shootingSubsystem.down();
-    } else if (RobotContainer.ctrlJoystick.getRawButtonPressed(4)) {
-      shootingSubsystem.up();
+    if (RobotContainer.ctrlJoystick.getRawButtonPressed(4)) { // intake
+      shootingSubsystem.serializer.set(0.15);
+      Timer.delay(0.6);
+      shootingSubsystem.serializer.set(0);
     }
-    // if (RobotContainer.ctrlJoystick.getRawButton(3)) {
-    //   intake.shooter.set(0.4);
-    // } else {
-    //   intake.shooter.set(0);
-    // }
-    if (RobotContainer.ctrlJoystick.getRawButtonPressed(3)) {
-      shootingSubsystem.shoot();
-    } 
-    if (RobotContainer.ctrlJoystick.getRawButton(2)) {
-      shootingSubsystem.shooter.set(-0.1);
-      shootingSubsystem.serializer.set(-0.4);
-      shootingSubsystem.down();
+    SmartDashboard.putBoolean("5", RobotContainer.ctrlJoystick.getRawButton(5));
+    if (RobotContainer.ctrlJoystick.getRawButton(5)) {
+      shootingSubsystem.intakeMotor.set(0.25);
+    }
+    else if (RobotContainer.ctrlJoystick.getRawButton(2)) {
+      shootingSubsystem.serializer.set(-0.2);
       shootingSubsystem.intakeMotor.set(-0.2);
     } else {
+      shootingSubsystem.serializer.set(0);
+      shootingSubsystem.intakeMotor.set(0);
+    }
+    if (RobotContainer.ctrlJoystick.getRawButtonPressed(3)) { //shoot
+      shootingSubsystem.intakeMotor.set(0.2);
+      shootingSubsystem.shooter.set(0.6);
+      Timer.delay(1);
+      shootingSubsystem.serializer.set(0.15);
+      Timer.delay(2);
       shootingSubsystem.shooter.set(0);
+      shootingSubsystem.serializer.set(0);
+      shootingSubsystem.intakeMotor.set(0);
     }
-    // if (RobotContainer.ctrlJoystick.getRawAxis(1) > 0.05) { // TODO: add man-control support
-    //   intake.angleControlTalonFX.set(0.05);
-    // }
-    // if (RobotContainer.ctrlJoystick.getRawAxis(1) < -0.05 && !intake.anglePosDown) {
-    //   intake.angleControlTalonFX.set(-0.05);
-    // }
-    if (shootingSubsystem.angleEncoder.getSelectedSensorPosition() < Constants.angleZeroPos) {
-      shootingSubsystem.anglePosDown = true;
-    } else {
-      shootingSubsystem.anglePosDown = false;
-    }
-
-    if (RobotContainer.ctrlJoystick.getRawButtonPressed(1)) {
+    if (RobotContainer.ctrlJoystick.getRawButton(1)) { //aim
       shootingSubsystem.aim();
+    } 
+    if (RobotContainer.ctrlJoystick.getRawButtonPressed(6)) {
+      shootingSubsystem.shootLow();
     }
-
+    // if (shootingSubsystem.angleEncoder.getSelectedSensorPosition() < Constants.angleZeroPos) {
+    //   shootingSubsystem.anglePosDown = true;
+    // } else {
+    //   shootingSubsystem.anglePosDown = false;
+    // }
+    // shootingSubsystem.angleEncoder.set(RobotContainer.ctrlJoystick.getRawAxis(1))
   }
 
   // Called once the command ends or is interrupted.

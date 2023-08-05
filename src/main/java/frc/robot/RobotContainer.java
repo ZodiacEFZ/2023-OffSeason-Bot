@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.SignalControl;
+import frc.robot.commands.SwerveAuto;
 import frc.robot.commands.SwerveDrive;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.ShootingSubsystem;
@@ -28,7 +29,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  private final SwerveAuto m_autoCommand = new SwerveAuto(swerveSubsystem, m_intake);
 
   public static SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   public static SwerveModule LeftFrontSwerveModule = new SwerveModule(1, Constants.LFa, Constants.LFv, Constants.LF0, false);      //(number, angleMotorPort, velocityMotorPort, zeroPosition)
