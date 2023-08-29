@@ -30,7 +30,7 @@ public class ShootingSubsystem extends SubsystemBase {
     angleEncoder.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
     //angleEncoder.setInverted(true);
     angleEncoder.config_kP(0, 0.15);
-    angleEncoder.config_kI(0, 0.0001);
+    angleEncoder.config_kI(0, 0.0002);
     angleEncoder.config_kD(0, 0);
     angleEncoder.config_kF(0, 0);
     angleEncoder.setNeutralMode(NeutralMode.Brake);
@@ -141,16 +141,16 @@ public class ShootingSubsystem extends SubsystemBase {
 
 
   public void aim() {
-    double shootingAngle = 3075.03 - 3.91221 * distance;
-    if(shootingAngle<-6600) shootingAngle=-6600;
-    if(shootingAngle>3400) shootingAngle=3400;
+    double shootingAngle = 1869.8 - 15.73 * distance;
+    if(shootingAngle<-10195) shootingAngle=-10195;
+    if(shootingAngle>126) shootingAngle=126;
     angleEncoder.set(ControlMode.Position, shootingAngle);
   }
 
   public void shootLow() {
     shooter.set(0.3);
     // Timer.delay(0.5);
-    angleEncoder.set(ControlMode.Position, -3000);
+    angleEncoder.set(ControlMode.Position, -8000);
     Timer.delay(1);
     serializer.set(0.2);
     Timer.delay(1);
@@ -162,10 +162,11 @@ public class ShootingSubsystem extends SubsystemBase {
 /*
  * List of shooting data:
  * Pos Dis
- * 1000 370
- * 1745 304
- * 2136 270
- * 2146 315
- * 1760     425
+ *  1073 248
+ *  665 285
+    -153 334
+ *  -150 330  
+ *  666 228
+ * dis<350
  * 
  */

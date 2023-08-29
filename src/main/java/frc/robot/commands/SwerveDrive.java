@@ -133,7 +133,7 @@ public class SwerveDrive extends CommandBase {
             else if (error < -180)
               error += 360;
             // error=0;
-            rot_value = error * 0.01;
+            rot_value = error * 0.02;
             if(rot_value>0.5) rot_value=0.5;
             if(rot_value<-0.5)  rot_value=-0.5;
             SmartDashboard.putNumber("error", error);

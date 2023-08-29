@@ -48,7 +48,8 @@ public class SignalControl extends CommandBase {
     }
     if (RobotContainer.ctrlJoystick.getRawButtonPressed(3)) { //shoot
       shootingSubsystem.intakeMotor.set(0.2);
-      shootingSubsystem.shooter.set(0.6);
+      if(shootingSubsystem.distance>420) shootingSubsystem.shooter.set(0.55);
+      else shootingSubsystem.shooter.set(0.5);
       Timer.delay(1);
       shootingSubsystem.serializer.set(0.15);
       Timer.delay(2);

@@ -24,7 +24,7 @@ public class SwerveModule extends SubsystemBase {
     velocityMotor = new WPI_TalonFX(vID);
     velocityMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     // velocityMotor.configFactoryDefault();
-    velocityMotor.config_kP(0, 0.06);
+    velocityMotor.config_kP(0, 0.15);
     velocityMotor.config_kI(0, 0);
     velocityMotor.config_kD(0, 0);
     velocityMotor.config_kF(0, 0);

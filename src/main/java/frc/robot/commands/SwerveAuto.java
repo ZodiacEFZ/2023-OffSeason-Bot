@@ -43,7 +43,6 @@ public class SwerveAuto extends CommandBase {
     SmartDashboard.putNumber("time", t);
     if (moving) {
       double error = targetangle - swerveSubsystem.get_field_angle();
-      // error = -error; //seems wrong
       if (error > 180)
         error -= 360;
       else if (error < -180)
@@ -62,39 +61,39 @@ public class SwerveAuto extends CommandBase {
       RobotContainer.RightFrontSwerveModule.setStatus(angleGoal[2], velocityGoal[2]);
       RobotContainer.RightBackSwerveModule.setStatus(angleGoal[3], velocityGoal[3]);
       RobotContainer.LeftBackSwerveModule.setStatus(angleGoal[4], velocityGoal[4]);
-      if(/*shootingSubsystem.spotted&&shootingSubsystem.distance>300&&*/(t-start)>=3){
+      if(/*shootingSubsystem.spotted&&shootingSubsystem.distance>300&&*/(t-start)>=2){
         moving=false;
         RobotContainer.LeftFrontSwerveModule.setStatus(0, 0);
         RobotContainer.RightFrontSwerveModule.setStatus(0, 0);
         RobotContainer.RightBackSwerveModule.setStatus(0, 0);
         RobotContainer.LeftBackSwerveModule.setStatus(0, 0);
       }
-    } else {
-     /* if (aimmingState) {
-        double crx = ShootingSubsystem.getInstance().targetX, error = -crx / 100;
-        if (error > 0.2)
-          error = 0.2;
-        if (error < -0.2)
-          error = -0.2;
-        if (Math.abs(error) > 0.1) {
-          swerveSubsystem.car_oriented(0, 0, error);
-        } else {
-          RobotContainer.LeftFrontSwerveModule.setStatus(0, 0);
-          RobotContainer.RightFrontSwerveModule.setStatus(0, 0);
-          RobotContainer.RightBackSwerveModule.setStatus(0, 0);
-          RobotContainer.LeftBackSwerveModule.setStatus(0, 0);
-          aimmingState = false;
-        }
-      } else {
-        shootingSubsystem.shooter.set(0.6);
-        Timer.delay(1);
-        shootingSubsystem.serializer.set(0.2);
-        Timer.delay(2);
-        shootingSubsystem.shooter.set(0);
-        shootingSubsystem.serializer.set(0);
-        end = true;
-      }*/
-    }
+     } //else {
+    //  /* if (aimmingState) {
+    //     double crx = ShootingSubsystem.getInstance().targetX, error = -crx / 100;
+    //     if (error > 0.2)
+    //       error = 0.2;
+    //     if (error < -0.2)
+    //       error = -0.2;
+    //     if (Math.abs(error) > 0.1) {
+    //       swerveSubsystem.car_oriented(0, 0, error);
+    //     } else {
+    //       RobotContainer.LeftFrontSwerveModule.setStatus(0, 0);
+    //       RobotContainer.RightFrontSwerveModule.setStatus(0, 0);
+    //       RobotContainer.RightBackSwerveModule.setStatus(0, 0);
+    //       RobotContainer.LeftBackSwerveModule.setStatus(0, 0);
+    //       aimmingState = false;
+    //     }
+    //   } else {
+    //     shootingSubsystem.shooter.set(0.6);
+    //     Timer.delay(1);
+    //     shootingSubsystem.serializer.set(0.2);
+    //     Timer.delay(2);
+    //     shootingSubsystem.shooter.set(0);
+    //     shootingSubsystem.serializer.set(0);
+    //     end = true;
+    //   }*/
+    // }
 
   }
 
